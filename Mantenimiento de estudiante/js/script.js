@@ -6,9 +6,17 @@ $(document).on("ready", function() {
 
 $(document).ready(function() {
 
+    $('#btnClean').click(function() {
+        ClearForm();
+    }); //fin btnClean
+
     $('#btnFind').click(function() {
         GetPersonaById($('#txtcedula').val());
     }); //fin btnFind
+
+    $('#btnDelete').click(function() {
+        DeletePersonById($('#txtcedula').val());
+    }); //fin btnDelete
 
     $('#btnSend').click(function() {
         var estudiante = new Object();
@@ -17,7 +25,7 @@ $(document).ready(function() {
         estudiante.apellido = $('#txtlastname').val();
         estudiante.edad = $('#txtage').val();
         estudiante.cedula = $('#txtcedula').val();
-        estudiante.fech_nac = $('txtfech_nac').val();
+        estudiante.fech_nac = $('txtdate').val();
         estudiante.telefono = $('#txtphone').val();
         estudiante.email = $('#txtemail').val();
 
@@ -25,15 +33,40 @@ $(document).ready(function() {
 
     }); //fin btnSend
 
+    $('#btnMod').click(function() {
+        var estudiante = new Object();
+
+        estudiante.cedula = $('#txtcedula').val();
+        estudiante.nombre = $('#txtnames').val();
+        estudiante.apellido = $('#txtlastname').val();
+        estudiante.edad = $('#txtage').val();
+        estudiante.fech_nac = $('#txtdate').val();
+        estudiante.telefono = $('#txtphone').val();
+        estudiante.email = $('#txtemail').val();
+
+        UpdatePerson(estudiante.cedula, JSON.stringify(estudiante));
+    });
+
 }); //fin funcion ready
 
+function CreatePerson(estudiante) {
+    var url = 'http://localhost:18790/api/estudiantes/';
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: estudiante,
+        contentType: "application/json;chartset=utf-8",
+        success: ClearForm()
+            //datatype: 'estudiantes'
+    });
+}
 
 function GetPersonaById(cedula) {
     var url = 'http://localhost:18790/api/estudiantes/' + cedula;
     $.getJSON(url)
 
     .done(function(data) {
-            console.log(data);
+            //console.log(data);
             $('#txtnames').val(data.nombre);
             $('#txtlastname').val(data.apellido);
             $('#txtage').val(data.edad);
@@ -43,19 +76,42 @@ function GetPersonaById(cedula) {
             $('#txtemail').val(data.email);
         })
         .fail(function(erro) {
-            console.log(erro);
+            // console.log(erro);
             ClearForm();
         });
 } //fin btnFind
 
 
+//Update person
+function UpdatePerson(cedula, estudiante) {
+    var url = 'http://localhost:18790/api/estudiantes/' + cedula;
+    $.ajax({
+        url: url,
+        type: 'PUT',
+        data: estudiante,
+        contentType: "application/json;chartset=utf-8",
+        success: ClearForm()
+    });
+}
+//Delete person by id
+function DeletePersonById(idPerson) {
+    var url = 'http://localhost:18790/api/estudiantes/' + idPerson;
+    $.ajax({
+        url: url,
+        type: 'DELETE',
+        contentType: "application/json;chartset=utf-8",
+        success: ClearForm()
+    });
+}
+
+
 function ClearForm() {
-    $('#txtname').val('');
+    $('#txtnames').val('');
     $('#txtlastname').val('');
     $('#txtage').val('');
     $('#txtcedula').val('');
     $('#txtphone').val('');
-    $('#txtdata').val('');
+    $('#txtdate').val('');
     $('#txtemail').val('');
 }
 
